@@ -2,19 +2,25 @@ import { useEffect, useState } from "react";
 import { FlowHeader } from "./FlowHeader";
 import { FlowGrid } from "./FlowGrid";
 import { StreamView } from "./StreamView";
+import { AppsGrid } from "./AppsGrid";
+import { AppView } from "./AppView";
 import { EditorView } from "./canvas/EditorView";
 
+interface ViewState {
+  type: "dashboard" | "stream" | "editor" | "apps" | "app";
+  id?: string;
+}
+
 export const FlowContent = ({ currentView = "streams" }) => {
-  const [viewState, setViewState] = useState<{
-    type: "dashboard" | "stream" | "editor" | "apps";
-    id?: string;
-  }>({ type: "dashboard" });
+  const [viewState, setViewState] = useState<ViewState>({
+    type: "dashboard",
+  });
 
   // Update view when sidebar selection changes
   useEffect(() => {
     setViewState((prev) => ({
       ...prev,
-      type: currentView === "apps" ? "apps" : "dashboard"
+      type: currentView === "apps" ? "apps" : "dashboard",
     }));
   }, [currentView]);
 
@@ -32,9 +38,25 @@ export const FlowContent = ({ currentView = "streams" }) => {
       {viewState.type === "apps" && (
         <>
           <FlowHeader title="Apps" subtitle="OS Configurations" onBack={null} />
-          <FlowGrid
-  onStreamSelect={(streamId) => setViewState({ type: "stream", id: streamId })}
-/>
+          <AppsGrid
+            onAppSelect={(appId) => setViewState({ type: "app", id: appId })}
+          />
+        </>
+      )}
+
+      {viewState.type === "app" && (
+        <>
+          <FlowHeader
+            title={viewState.id || ""}
+            subtitle="Configurations"
+            onBack={() => setViewState({ type: "apps" })}
+          />
+          <AppView
+            appId={viewState.id || ""}
+            onStreamSelect={(streamId) =>
+              setViewState({ type: "stream", id: streamId })
+            }
+          />
         </>
       )}
 
@@ -43,7 +65,13 @@ export const FlowContent = ({ currentView = "streams" }) => {
           <FlowHeader
             title={viewState.id || ""}
             subtitle="Flows"
-            onBack={() => setViewState({ type: "dashboard" })}
+            onBack={() =>
+              setViewState((prev) =>
+                prev.type === "app"
+                  ? { type: "app", id: prev.id }
+                  : { type: "dashboard" }
+              )
+            }
           />
           <StreamView
             streamId={viewState.id || ""}

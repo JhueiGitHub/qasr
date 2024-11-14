@@ -2,6 +2,7 @@ import "./globals.css";
 import OTPWrapper from "@/app/components/custom-otp-input";
 import { ClerkProvider } from "@clerk/nextjs";
 import { DesignSystemProvider } from "./contexts/DesignSystemContext";
+import QueryProvider from "@/app/components/providers/query-provider";
 
 export const metadata = {
   title: "Orion",
@@ -16,11 +17,13 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <DesignSystemProvider>
-          <body className="h-screen w-screen bg-black">
-            <OTPWrapper>{children}</OTPWrapper>
-          </body>
-        </DesignSystemProvider>
+        <QueryProvider>
+          <DesignSystemProvider>
+            <body className="h-screen w-screen bg-black">
+              <OTPWrapper>{children}</OTPWrapper>
+            </body>
+          </DesignSystemProvider>
+        </QueryProvider>
       </html>
     </ClerkProvider>
   );
