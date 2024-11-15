@@ -1,78 +1,37 @@
-export type NodeType = "wallpaper" | "dockConfig" | "windowConfig";
-export type NodeValueType = "color" | "image" | "video";
+// /types/flow.ts
+import {
+  Stream,
+  Flow,
+  FlowComponent as PrismaFlowComponent,
+} from "@prisma/client";
 
-export interface NodePosition {
-  x: number;
-  y: number;
-}
-
-export interface NodeData {
-  type: NodeValueType;
-  value: string;
-  opacity?: number;
-  config?: Record<string, any>;
-}
-
-export interface FlowNodeData {
-  id: string;
-  type: NodeType;
-  position: NodePosition;
-  data: NodeData;
-  designSystemId: string; // For inheriting colors/fonts
-  label: string;
-}
-
-export interface AppConfigFlow {
+export interface FlowComponent extends PrismaFlowComponent {
   id: string;
   name: string;
-  type: "APP_CONFIG";
-  appId: string;
-  nodes: FlowNodeData[];
-  designSystemId: string;
+  type: string;
+  value: string | null;
+  opacity: number | null;
+  fontFamily: string | null;
+  strokeWidth: number | null;
+  mappedTokenId: string | null;
+  mediaUrl: string | null;
+  tokenId: string | null;
+  tokenValue: string | null;
+  order: number;
+  flowId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface AppDefinition {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  defaultNodes: FlowNodeData[];
+export interface FlowWithComponents extends Flow {
+  components: FlowComponent[];
 }
 
-export const APP_DEFINITIONS: Record<string, AppDefinition> = {
-  orion: {
-    id: "orion",
-    name: "Orion",
-    description: "System Configuration",
-    icon: "/icons/orion.svg",
-    defaultNodes: [
-      {
-        id: "wallpaper",
-        type: "wallpaper",
-        position: { x: 100, y: 100 },
-        data: {
-          type: "color",
-          value: "#000000",
-          opacity: 100,
-        },
-        designSystemId: "", // Set during creation
-        label: "Wallpaper",
-      },
-      {
-        id: "dock",
-        type: "dockConfig",
-        position: { x: 100, y: 300 },
-        data: {
-          type: "color",
-          value: "Glass",
-          opacity: 30,
-          config: {
-            icons: {},
-          },
-        },
-        designSystemId: "",
-        label: "Dock",
-      },
-    ],
-  },
+export interface StreamWithFlows extends Stream {
+  flows: FlowWithComponents[];
+}
+
+// Type guard for component types
+export const isMediaComponent = (component: FlowComponent): boolean => {
+  return component.type === "WALLPAPER" || component.type === "DOCK_ICON";
 };

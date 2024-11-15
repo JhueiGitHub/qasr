@@ -17,7 +17,10 @@ export async function GET(
 
     const flow = await db.flow.findUnique({
       where: { id: params.flowId, profileId: profile.id },
-      include: { components: true },
+      include: {
+        components: true,
+        stream: true, // Add this to get the stream type
+      },
     });
 
     if (!flow) {
@@ -58,13 +61,15 @@ export async function PATCH(
                 name: component.name,
               };
 
-              if (component.type === 'color') {
+              if (component.type === "color") {
                 return {
                   ...baseComponent,
                   value: component.value,
-                  opacity: component.opacity ? parseInt(component.opacity as string, 10) : null,
+                  opacity: component.opacity
+                    ? parseInt(component.opacity as string, 10)
+                    : null,
                 };
-              } else if (component.type === 'typography') {
+              } else if (component.type === "typography") {
                 return {
                   ...baseComponent,
                   fontFamily: component.fontFamily,

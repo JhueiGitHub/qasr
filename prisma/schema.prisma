@@ -26,9 +26,10 @@ model Profile {
   members      Member[]
   channels     Channel[]
   appConfigs   AppConfig[] // New relation
+  mediaItems   MediaItem[]
 
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // New Stream model
@@ -38,14 +39,14 @@ model Stream {
   name        String
   description String?
   type        StreamType
-  
-  profileId   String
-  profile     Profile    @relation(fields: [profileId], references: [id])
-  appId          String? // e.g. "orion"
-  flows       Flow[]     // Flows in this stream
 
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id])
+  appId     String? // e.g. "orion"
+  flows     Flow[] // Flows in this stream
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([profileId])
   @@index([appId])
@@ -115,10 +116,10 @@ model Flow {
   designSystemId String
   designSystem   DesignSystem    @relation(fields: [designSystemId], references: [id])
   components     FlowComponent[]
-  appConfig      AppConfig?      // New relation
+  appConfig      AppConfig? // New relation
 
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([profileId])
   @@index([streamId])
@@ -128,40 +129,75 @@ model Flow {
 
 // Updated FlowType enum
 enum FlowType {
-  CORE    // Design system standards
-  CONFIG  // App-specific mappings
-  CUSTOM  // User flows
+  CORE // Design system standards
+  CONFIG // App-specific mappings
+  CUSTOM // User flows
 }
 
 model FlowComponent {
-  id         String   @id @default(cuid())
-  name       String
-  type       String
-  value      String?
-  opacity    Int?
-  fontFamily String?
-  strokeWidth    Float?   // New field for border widths
-  mappedTokenId  String?  // New field to reference design system tokens
-  mediaUrl   String?   // For uploaded media
-  tokenValue String?   // For mapped token value
+  id            String      @id @default(cuid())
+  name          String
+  type          String
+  mode          String?
+  value         String?
+  opacity       Int?
+  fontFamily    String?
+  strokeWidth   Float? // New field for border widths
+  mappedTokenId String? // New field to reference design system tokens
+  mediaId       String? // For uploaded media
+  mediaItem     MediaItem[] // For uploaded media
+  mediaUrl      String? // For uploaded media
+  tokenId       String? // For mapped token value
+  tokenValue    String? // For mapped token value
+  order         Int
 
-  flowId     String
-  flow       Flow     @relation(fields: [flowId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  flowId    String
+  flow      Flow     @relation(fields: [flowId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([flowId])
 }
 
+// Add new enum for component types
+enum ComponentType {
+  COLOR
+  TYPOGRAPHY
+  WALLPAPER
+  DOCK_ICON
+}
+
+model MediaItem {
+  id              String         @id @default(uuid())
+  name            String // Original filename
+  type            MediaType // Enum for media types
+  url             String // Uploadcare CDN URL
+  profileId       String
+  profile         Profile        @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  FlowComponent   FlowComponent? @relation(fields: [flowComponentId], references: [id])
+  flowComponentId String?
+
+  @@index([profileId])
+  @@index([flowComponentId])
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  FONT
+}
+
 // New model for app configuration
 model AppConfig {
-  id        String   @id @default(cuid())
-  appId     String   // e.g. "orion", "finder", etc.
-  flowId    String   @unique // One config flow per app
+  id        String @id @default(cuid())
+  appId     String // e.g. "orion", "finder", etc.
+  flowId    String @unique // One config flow per app
   profileId String
-  
-  flow      Flow     @relation(fields: [flowId], references: [id])
-  profile   Profile  @relation(fields: [profileId], references: [id])
+
+  flow    Flow    @relation(fields: [flowId], references: [id])
+  profile Profile @relation(fields: [profileId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -1,7 +1,7 @@
-// /app/api/apps/[appId]/streams/route.ts
-import { NextResponse } from "next/server";
-import { currentProfile } from "@/lib/current-profile";
+// app/api/apps/[appId]/streams/route.ts
 import { db } from "@/lib/db";
+import { currentProfile } from "@/lib/current-profile";
+import { NextResponse } from "next/server";
 
 export async function GET(
   req: Request,
@@ -16,20 +16,28 @@ export async function GET(
 
     const streams = await db.stream.findMany({
       where: {
+        id: params.appId, // Changed from appId to id since we're passing the stream ID
         profileId: profile.id,
-        appId: params.appId,
+        type: "CONFIG", // Changed from CORE to CONFIG
       },
       include: {
-        flows: true,
-      },
-      orderBy: {
-        createdAt: "desc",
+        flows: {
+          include: {
+            components: true,
+          },
+          orderBy: {
+            updatedAt: "desc",
+          },
+        },
       },
     });
 
+    console.log("[APP_STREAMS_GET] streamId:", params.appId);
+    console.log("[APP_STREAMS_GET] streams:", JSON.stringify(streams, null, 2));
+
     return NextResponse.json(streams);
   } catch (error) {
-    console.log("[STREAMS_GET]", error);
+    console.error("[APP_STREAMS_GET]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

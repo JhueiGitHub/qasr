@@ -26,6 +26,8 @@
       "@dis/*": ["./app/apps/discord/*"],
       "@disc/*": ["./app/apps/discord/components/*"],
       "@fig/*": ["./app/apps/figma/*"],
+      "@flow/*": ["./app/apps/flow/*"],
+      "@flowc/*": ["./app/apps/flow/components/*"],
       "@an/*": ["./app/apps/anki/*"],
       "@anc/*": ["./app/apps/anki/components/*"]
     },

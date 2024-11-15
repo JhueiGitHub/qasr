@@ -1,10 +1,11 @@
+// app/api/flows/[flowId]/components/[componentId]/route.ts
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { currentProfile } from "@/lib/current-profile";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { flowId: string } }
+  { params }: { params: { flowId: string; componentId: string } }
 ) {
   try {
     const profile = await currentProfile();
@@ -12,29 +13,19 @@ export async function PATCH(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { components } = await req.json();
+    const body = await req.json();
 
-    const updatedFlow = await db.flow.update({
+    const component = await db.flowComponent.update({
       where: {
-        id: params.flowId,
-        profileId: profile.id,
+        id: params.componentId,
+        flowId: params.flowId,
       },
-      data: {
-        components: {
-          deleteMany: {},
-          createMany: {
-            data: components,
-          },
-        },
-      },
-      include: {
-        components: true,
-      },
+      data: body,
     });
 
-    return NextResponse.json(updatedFlow);
+    return NextResponse.json(component);
   } catch (error) {
-    console.error("[FLOW_PATCH]", error);
+    console.error("[COMPONENT_PATCH]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

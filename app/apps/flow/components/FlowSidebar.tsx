@@ -25,9 +25,9 @@ export const FlowSidebar = ({ onViewChange }: FlowSidebarProps) => {
             Odin
           </span>
           <img
-            src="/icns/_chev.png"
+            src="/icns/system/chev/chevS.png"
             alt="Chevron"
-            className="w-[7px] h-[7px] -rotate-90"
+            className="w-[7px] h-[7px]"
           />
         </div>
 

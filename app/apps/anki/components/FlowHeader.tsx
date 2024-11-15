@@ -19,7 +19,11 @@ export const FlowHeader = ({ title, subtitle, onBack }: FlowHeaderProps) => {
             className="w-5 h-5"
             onClick={onBack}
           >
-            <img src="/icns/_chev.png" alt="Back" className="w-5 h-5" />
+            <img
+              src="/icns/system/chev/chevL.png"
+              alt="Back"
+              className="w-5 h-5"
+            />
           </Button>
         )}
       </div>
@@ -39,7 +43,7 @@ export const FlowHeader = ({ title, subtitle, onBack }: FlowHeaderProps) => {
               {title}
             </span>
             <img
-              src="/icns/_chev.png"
+              src="/icns/system/chev/chevL.png"
               alt="Chevron"
               className="w-5 h-5 -rotate-90"
             />

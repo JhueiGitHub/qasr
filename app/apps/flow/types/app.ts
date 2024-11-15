@@ -1,23 +1,62 @@
-import { Flow } from "@prisma/client";
+// /app/types/flow.ts
+import { Stream, Flow, Profile } from "@prisma/client";
 
-// /app/apps/flow/types/app.ts
-export interface FlowApp {
-  id: string;
+// Matching our actual Prisma schema
+export type ComponentType = "COLOR" | "TYPOGRAPHY" | "WALLPAPER" | "DOCK_ICON";
+
+export interface FlowComponentInput {
   name: string;
-  description?: string;
-  icon: string;
-  type: "CORE" | "CONFIG";
-  streams?: FlowStream[];
-  createdAt: Date;
-  updatedAt: Date;
+  type: string; // Matches Prisma schema where type is String, not enum
+  value: string | null;
+  order: number;
 }
 
-export interface FlowStream {
-  id: string;
+export interface FlowCreateInput {
   name: string;
-  description?: string;
-  flows: Flow[];
+  description: string | null;
+  type: "CONFIG";
+  profileId: string;
+  streamId: string | null;
+  designSystemId: string;
+  components: {
+    create: FlowComponentInput[];
+  };
+}
+
+export interface StreamCreateInput {
+  name: string;
+  description: string | null;
+  type: "CORE";
   appId: string;
-  createdAt: Date;
-  updatedAt: Date;
+  profileId: string;
 }
+
+// Extended types for frontend use with proper typing
+export interface FlowComponent {
+  id: string;
+  name: string;
+  type: string; // Matches Prisma schema
+  value: string | null;
+  order: number;
+  flowId: string;
+  opacity: number | null;
+  fontFamily: string | null;
+  strokeWidth: number | null;
+  mappedTokenId: string | null;
+  mediaUrl: string | null;
+  tokenId: string | null;
+  tokenValue: string | null;
+}
+
+export interface FlowWithComponents extends Flow {
+  components: FlowComponent[];
+}
+
+export interface StreamWithFlows extends Stream {
+  flows: FlowWithComponents[];
+}
+
+// Type guard for component types
+export const isMediaComponent = (component: FlowComponent): boolean => {
+  return component.type === "WALLPAPER" || component.type === "DOCK_ICON";
+};
